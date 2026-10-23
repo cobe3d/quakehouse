@@ -1,0 +1,1455 @@
+<title>抗震屋大挑戰</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* Layout: lab bench — tool rack | shake table on graph paper | inspection sheet */
+:root{
+  --bg:#e4e9eb; --surface:#f6f8f8; --panel:#ffffff; --line:#c8d1d5;
+  --grid:#e0e6e8; --grid-strong:#ccd6da;
+  --ink:#1a2226; --muted:#56646a; --faint:#8a979c;
+  --accent:#efb316; --accent-ink:#2a1f00; --accent-soft:#fbefc8;
+  --wood:#c68d4c; --wood-edge:#7d5126; --wood-thick:#a66f33;
+  --rope:#eadcb9; --rope-edge:#8c7650;
+  --steel:#474f56; --steel-hi:#8f99a0; --glue:rgba(255,255,255,.9);
+  --ok:#23835a; --ok-soft:#dcefe5; --warn:#b8720a; --danger:#cc3b2a; --danger-soft:#f8e0dc;
+  --pit:#3b4347; --plate:#d9b98a;
+  --f-display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-hand:"LXGW WenKai TC","Noto Sans TC","Microsoft JhengHei",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111518; --surface:#171d21; --panel:#1c2327; --line:#2d383e;
+    --grid:#1f272b; --grid-strong:#2a343a;
+    --ink:#e7ecee; --muted:#9aa7ad; --faint:#6c7a80;
+    --accent:#f3c033; --accent-ink:#241a00; --accent-soft:#3a3115;
+    --wood:#d49a58; --wood-edge:#8f5f2f; --wood-thick:#b47b3c;
+    --rope:#e4d4ae; --rope-edge:#a08a62;
+    --steel:#8b959c; --steel-hi:#bcc5ca; --glue:rgba(255,255,255,.6);
+    --ok:#4cc086; --ok-soft:#173326; --warn:#e3a13a; --danger:#ee6a56; --danger-soft:#3a1d19;
+    --pit:#0b0e10; --plate:#7a6142;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111518; --surface:#171d21; --panel:#1c2327; --line:#2d383e;
+  --grid:#1f272b; --grid-strong:#2a343a;
+  --ink:#e7ecee; --muted:#9aa7ad; --faint:#6c7a80;
+  --accent:#f3c033; --accent-ink:#241a00; --accent-soft:#3a3115;
+  --wood:#d49a58; --wood-edge:#8f5f2f; --wood-thick:#b47b3c;
+  --rope:#e4d4ae; --rope-edge:#a08a62;
+  --steel:#8b959c; --steel-hi:#bcc5ca; --glue:rgba(255,255,255,.6);
+  --ok:#4cc086; --ok-soft:#173326; --warn:#e3a13a; --danger:#ee6a56; --danger-soft:#3a1d19;
+  --pit:#0b0e10; --plate:#7a6142;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:10px;padding-block:10px}
+
+/* header */
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{flex:none}
+.brand h1{font-family:var(--f-display);font-weight:900;font-size:22px;margin:0;letter-spacing:.02em;text-wrap:balance}
+.brand small{display:block;font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.04em}
+.timer{margin-left:auto;display:flex;align-items:baseline;gap:8px;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.timer b{font-size:30px;font-weight:600;line-height:1}
+.timer span{font-family:var(--f-body);font-size:12px;color:var(--muted)}
+.timer.warn b{color:var(--warn)}
+.timer.crit b{color:var(--danger);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.45}}
+.topbtns{display:flex;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 14px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.btn.ghost{background:transparent}
+.btn.small{padding:4px 10px;font-size:13px}
+
+/* main */
+.main{display:grid;grid-template-columns:200px minmax(0,1fr) 290px;gap:12px;min-height:0}
+.rack,.sheet{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.label{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700;text-transform:uppercase}
+.tools{display:flex;flex-direction:column;gap:6px}
+.tool{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;text-align:left;border:1px solid transparent;background:transparent;border-radius:9px;padding:6px 8px}
+.tool:hover{background:var(--surface)}
+.tool[aria-pressed="true"]{border-color:var(--ink);background:var(--surface)}
+.tool .nm{font-weight:700;display:block}
+.tool .hint{font-size:12px;color:var(--muted);display:block;line-height:1.35}
+.tool kbd{font-family:var(--f-mono);font-size:11px;color:var(--faint);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap}
+.meter{display:grid;gap:4px}
+.meter .bar{height:6px;border-radius:3px;background:var(--grid-strong);overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--wood)}
+.meter .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.howto{font-family:var(--f-hand);font-size:14px;color:var(--muted);line-height:1.6;margin:0;padding-left:18px}
+
+.stage{display:grid;grid-template-rows:auto 1fr;gap:8px;min-height:0;min-width:0}
+.seis{position:relative;height:64px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seis canvas{width:100%;height:100%;display:block}
+.board{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:360px}
+.board canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:8px 14px;border-radius:8px;font-size:13px;max-width:90%;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+.speed{position:absolute;right:12px;top:12px;display:flex;gap:6px}
+
+/* inspection sheet */
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checks li{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center;font-size:13.5px}
+.checks .mk{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;background:var(--faint)}
+.checks li.ok .mk{background:var(--ok)}
+.checks li.bad .mk{background:var(--danger)}
+.checks .dt{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--surface);border-radius:8px;padding:8px 10px}
+.stat b{display:block;font-family:var(--f-mono);font-size:18px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.formula{font-size:13px;color:var(--muted);line-height:1.7;background:var(--surface);border-radius:8px;padding:10px 12px}
+.formula b{color:var(--ink);font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.rounds{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.rounds li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--surface);font-variant-numeric:tabular-nums}
+.rounds li b{font-family:var(--f-mono);font-weight:600}
+.rounds li small{color:var(--muted);font-size:12px}
+.pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--grid-strong);color:var(--muted)}
+.pill.run{background:var(--accent);color:var(--accent-ink)}
+.pill.pass{background:var(--ok-soft);color:var(--ok)}
+.pill.fail{background:var(--danger-soft);color:var(--danger)}
+.spacer{flex:1}
+
+/* overlays */
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(3px);display:grid;place-items:center;z-index:20;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.18);width:min(640px,100%);max-height:calc(100% - 20px);overflow:auto;padding:26px 28px;display:flex;flex-direction:column;gap:16px}
+.card.wide{width:min(900px,100%)}
+.card h2{font-family:var(--f-display);font-weight:900;font-size:28px;margin:0;line-height:1.25;text-wrap:balance}
+.card h3{font-size:15px;margin:0}
+.card p{margin:0}
+.lead{font-family:var(--f-hand);font-size:17px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.steps div{background:var(--surface);border-radius:10px;padding:12px}
+.steps b{display:block;font-size:14px;margin-bottom:2px}
+.steps span{font-size:13px;color:var(--muted)}
+.ruleslist{margin:0;padding-left:20px;display:grid;gap:6px}
+.ruleslist li{line-height:1.55}
+.cta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cta .btn.primary{padding:11px 22px;font-size:16px}
+.note{font-size:12px;color:var(--muted)}
+.note a{color:inherit}
+.verdict{display:flex;gap:14px;align-items:center}
+.verdict .big{font-family:var(--f-mono);font-size:40px;font-weight:600;line-height:1}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--accent);border-radius:999px;padding:4px 12px;font-weight:700;font-size:13px}
+.badge.off{border-color:var(--line);color:var(--faint);font-weight:500}
+.tip{border-left:4px solid var(--accent);background:var(--surface);border-radius:0 10px 10px 0;padding:10px 14px;font-family:var(--f-hand);font-size:16px;line-height:1.6}
+.form{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.form label{display:grid;gap:3px;font-size:12px;color:var(--muted)}
+.form input,.filter select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.code{display:flex;gap:8px;align-items:center}
+.code input{flex:1;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:8px;padding:7px 9px;min-width:0}
+.msg{font-size:13px}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--danger)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:700;background:var(--surface)}
+tbody tr:last-child td{border-bottom:none}
+td.num{font-family:var(--f-mono)}
+td.rank{font-family:var(--f-mono);font-weight:600;width:40px}
+tr.top1 td.rank{color:var(--warn)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--muted)}
+.del{border:none;background:none;color:var(--faint);font-size:16px;padding:0 4px}
+.del:hover{color:var(--danger)}
+.filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.teacher{border-top:1px dashed var(--line);padding-top:14px;display:grid;gap:8px}
+textarea{width:100%;min-height:90px;font-family:var(--f-mono);font-size:12px}
+
+@media (max-width: 980px){
+  .main{grid-template-columns:1fr;overflow:auto}
+  .rack .tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .board{min-height:70vh}
+  .app{height:auto;min-height:100%}
+  .steps{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){ .timer.crit b{animation:none} .toast{transition:none} }
+</style>
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">
+      <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><rect x="1" y="1" width="36" height="36" rx="9" fill="var(--accent)"/><path d="M5 22h5l2-7 3 13 3-18 3 15 2-6 2 3h8" fill="none" stroke="var(--accent-ink)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <div><h1>抗震屋大挑戰</h1><small>改編自 2026 抗震盃高中組規則</small></div>
+    </div>
+    <div class="timer" id="timer" hidden><span>建造時間</span><b id="timerVal">5:00</b></div>
+    <div class="topbtns" id="topbtns">
+      <button class="btn" id="btnRules">規則</button>
+      <button class="btn" id="btnBoard">排行榜</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <aside class="rack" id="rack">
+      <div class="label">材料與工具</div>
+      <div class="tools" id="tools"></div>
+      <div class="rowbtns">
+        <button class="btn small" id="btnUndo">復原 <span class="note">Ctrl+Z</span></button>
+        <button class="btn small ghost" id="btnClear">清空</button>
+      </div>
+      <div class="meter"><div class="row"><span>木條</span><span id="woodTxt">0 / 6 m</span></div><div class="bar"><i id="woodBar" style="width:0"></i></div></div>
+      <div class="meter"><div class="row"><span>棉繩</span><span id="ropeTxt">0 / 2 m</span></div><div class="bar"><i id="ropeBar" style="width:0;background:var(--rope-edge)"></i></div></div>
+      <div class="spacer"></div>
+      <div class="label">怎麼蓋</div>
+      <ol class="howto">
+        <li>從一個點拖到旁邊的點，放一根構件。</li>
+        <li>選「質量塊」，點橫梁放上去。</li>
+        <li>選「阻尼器」點橫梁吊上去，再點一次換繩長。</li>
+        <li>按右鍵或用橡皮擦刪除。</li>
+      </ol>
+    </aside>
+
+    <section class="stage">
+      <div class="seis"><canvas id="seis"></canvas></div>
+      <div class="board" id="boardWrap">
+        <canvas id="cv"></canvas>
+        <div class="speed" id="speed" hidden>
+          <button class="btn small" data-speed="1" aria-pressed="true">1×</button>
+          <button class="btn small" data-speed="3">3×</button>
+          <button class="btn small" id="btnSkip">直接看結果</button>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+    </section>
+
+    <aside class="sheet" id="sheet"></aside>
+  </div>
+</div>
+
+<!-- intro -->
+<div class="overlay" id="ovIntro">
+  <div class="card">
+    <h2>蓋一棟撐得過大地震的房子</h2>
+    <p class="lead">你有 5 分鐘，用木條、棉繩和熱熔膠蓋一棟 3 到 6 層樓的房子，再放上鐵塊當作家具和住戶，還可以像台北 101 一樣吊上阻尼器。蓋好後送上振動台，地震會一次比一次大。</p>
+    <div class="steps">
+      <div><b>1. 蓋房子</b><span>拖曳格點放柱子、橫梁和斜撐。</span></div>
+      <div><b>2. 放質量塊</b><span>4 到 12 塊，放越高分數加成越多。</span></div>
+      <div><b>3. 振動台測試</b><span>400 → 600 → 800 → 900 gal，撐越久越高分。</span></div>
+    </div>
+    <p>分數看 <b>CP 值</b>：房子撐得住越大的地震、載得越重、蓋得越省材料，CP 值就越高。</p>
+    <div class="cta">
+      <button class="btn primary" id="btnStart">開始挑戰（5 分鐘）</button>
+      <button class="btn" id="btnPractice">不計時練習</button>
+      <button class="btn ghost" id="btnIntroRules">看完整規則</button>
+    </div>
+    <p class="note">規則改編自國家地震工程研究中心〈2026 抗震盃高中組競賽規則〉，模擬結果用來理解概念，跟真實模型會有差距。</p>
+  </div>
+</div>
+
+<!-- rules -->
+<div class="overlay" id="ovRules" hidden>
+  <div class="card">
+    <h2>遊戲規則</h2>
+    <ol class="ruleslist">
+      <li><b>建造時間 5 分鐘。</b>時間到會直接送上振動台。</li>
+      <li><b>地基寬 3 格，每格 10 cm。</b>房子要有 3 到 6 層樓，最高的橫梁就是頂樓。</li>
+      <li><b>一樓中間那格是大門</b>，不能放斜撐或棉繩。</li>
+      <li><b>每根構件都要連到地面</b>，不能有懸空的部分。</li>
+      <li><b>質量塊 4 到 12 塊</b>，每塊 635 g，只能放在木條橫梁上，一格最多疊 2 塊。</li>
+      <li><b>材料：</b>木條共 6 m（粗木條是兩根黏在一起，算兩倍長），棉繩共 2 m。</li>
+      <li><b>懸吊阻尼器</b>最多 2 個，每個用掉 1 塊質量塊和一段棉繩，吊在橫梁下面當擺錘。繩子越長擺得越慢（頻率越低）。阻尼器的頻率比房子的自然頻率低一點，通常最能減少搖晃。</li>
+      <li><b>振動台測試</b>依序是 400、600、800、900 gal。發生以下任一情況就算失敗：房子倒塌、質量塊掉落、一半以上的柱腳被拔起、地震停止後房子歪掉超過 10 cm。</li>
+    </ol>
+    <div class="formula">
+      性能 = 撐過的最大地震（gal ÷ 980）× 質量塊數 × 高度加成<br>
+      高度加成 = 1 + 質量塊平均樓層 ÷ 6<br>
+      價格 = 材料重量 ÷ 100 g<br>
+      <b>CP 值 = 性能 ÷ 價格</b>
+    </div>
+    <p class="note">原始規則：<a href="https://www.ncree.org/ideers/2026/download/IDEERS2026_HighSchool_ZH.pdf" target="_blank" rel="noopener">IDEERS 2026 高中組競賽規則（PDF）</a>。比賽題目是單一載重平台的塔，這個遊戲改成多層房屋，計分方式也跟著簡化。</p>
+    <div class="cta"><button class="btn primary" data-close="ovRules">知道了</button></div>
+  </div>
+</div>
+
+<!-- result -->
+<div class="overlay" id="ovResult" hidden>
+  <div class="card" id="resultCard"></div>
+</div>
+
+<!-- leaderboard -->
+<div class="overlay" id="ovBoard" hidden>
+  <div class="card wide">
+    <div class="filter">
+      <h2 style="margin-right:auto">排行榜</h2>
+      <label class="note" for="clsFilter">班級</label>
+      <select id="clsFilter"><option value="">全部</option></select>
+      <button class="btn" data-close="ovBoard">關閉</button>
+    </div>
+    <p class="note" id="boardStatus">正在連線排行榜…</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>#</th><th>名字</th><th>班級</th><th>CP 值</th><th>撐過</th><th>樓層</th><th>質量塊</th><th>材料</th><th>用時</th><th></th></tr></thead>
+      <tbody id="boardBody"></tbody>
+    </table></div>
+    <div class="teacher" id="teacherBox" hidden>
+      <h3>老師登錄成績碼</h3>
+      <p class="note">學生沒有排行榜寫入權限時，會拿到一組成績碼。把成績碼貼在下面（一行一組），系統會重新跑一次振動台模擬，確認分數後登錄。</p>
+      <textarea id="codesIn" placeholder="KZ1.…"></textarea>
+      <div class="cta"><button class="btn primary" id="btnImport">驗證並登錄</button><span class="msg" id="importMsg"></span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SIM-START =====
+const SIM = (() => {
+  const COLS = 4, MAXF = 6, CELL = 0.1, G = 9.8, DT = 8e-5, FILT = 0.025;
+  const BLOCK_KG = 0.635, NODE_KG = 0.015, J = 2e-5, ANCHOR_CAP = 80, CN = 2.5;
+  const W0 = 100, WOOD_MAX = 60, ROPE_MAX = 20, BLOCK_MIN = 4, BLOCK_MAX = 12, FLOOR_MIN = 3;
+  // hanging damper: one mass block on a rope under a beam; rope length sets the swing frequency
+  const DAMP_LEN = [0.01, 0.015, 0.025, 0.04, 0.06], DAMP_MAX = 2, DAMP_ZETA = 0.3, DAMP_STROKE = 0.6, BUMPER_K = 5000;
+  const PGAS = [400, 600, 800, 900];
+  const QUAKE_T = 8, SETTLE_T = 1.5, GRAV_T = 1.5, AFTER_T = 2;
+  // EA (N), joint stiffness kr (N·m/rad), joint moment cap (N·m), buckling pcr/L² (N·m²), tension cap (N), grams per m, glue grams per end
+  const MAT = {
+    w: { name: '木條', EA: 3.0e4, kr: 6.0, mcap: 0.6, pcr: 0.86, tcap: 140, gpm: 16.5, glue: 0.3 },
+    k: { name: '粗木條', EA: 6.0e4, kr: 15, mcap: 1.4, pcr: 5.0, tcap: 260, gpm: 33, glue: 0.5 },
+    r: { name: '棉繩', EA: 6.0e3, kr: 0, mcap: 0, pcr: 0, tcap: 60, gpm: 2.5, glue: 0.3 },
+  };
+  const id = (x, y) => y * COLS + x;
+  const xy = n => [n % COLS, Math.floor(n / COLS)];
+  const key = (a, b) => (a < b ? a + '-' + b : b + '-' + a);
+  const lenCells = (a, b) => { const [ax, ay] = xy(a), [bx, by] = xy(b); return Math.hypot(bx - ax, by - ay); };
+  const isBeam = m => m.t !== 'r' && xy(m.a)[1] === xy(m.b)[1];
+
+  function validPair(a, b) {
+    if (a === b) return '要拖到另一個點';
+    const [ax, ay] = xy(a), [bx, by] = xy(b);
+    if (ax < 0 || ax >= COLS || bx < 0 || bx >= COLS || ay < 0 || by < 0 || ay > MAXF || by > MAXF) return '超出建造範圍';
+    if (Math.abs(ax - bx) > 1 || Math.abs(ay - by) > 1) return '只能連到相鄰的格點（上下左右或斜角）';
+    if (ay === 0 && by === 0) return '地面是底板，不需要放橫梁';
+    if (ax !== bx && ay !== by && Math.min(ax, bx) === 1 && Math.min(ay, by) === 0) return '一樓中間是大門，不能放斜撐或棉繩';
+    return null;
+  }
+  function usage(d, skipKey) {
+    let wood = 0, rope = 0;
+    for (const m of d.members) {
+      if (skipKey && key(m.a, m.b) === skipKey) continue;
+      const L = lenCells(m.a, m.b);
+      if (m.t === 'r') rope += L; else wood += L * (m.t === 'k' ? 2 : 1);
+    }
+    for (const i of Object.values(d.dampers || {})) rope += DAMP_LEN[i] / CELL;
+    return { wood, rope };
+  }
+  const dampFreq = i => Math.sqrt(G / DAMP_LEN[i]) / (2 * Math.PI);
+  const totalBlocks = d => Object.values(d.masses || {}).reduce((s, c) => s + c, 0) + Object.keys(d.dampers || {}).length;
+  function canHang(d, m, li = 1) {
+    if (!isBeam(m)) return '阻尼器要吊在木條橫梁下面';
+    const [ax, ay] = xy(m.a), [bx] = xy(m.b);
+    if (ay === 1 && Math.min(ax, bx) === 1) return '大門上方不能吊阻尼器，會擋住大門';
+    if (Object.keys(d.dampers || {}).length >= DAMP_MAX) return '阻尼器最多 2 個';
+    if (totalBlocks(d) >= BLOCK_MAX) return '質量塊用完了（阻尼器也要用掉一塊質量塊）';
+    if (usage(d).rope + DAMP_LEN[li] / CELL > ROPE_MAX + 1e-9) return '棉繩不夠吊阻尼器了';
+    return null;
+  }
+  function canPlace(d, a, b, t) {
+    const bad = validPair(a, b);
+    if (bad) return bad;
+    const u = usage(d, key(a, b)), L = lenCells(a, b);
+    if (t === 'r' && u.rope + L > ROPE_MAX + 1e-9) return '棉繩用完了（最多 2 m）';
+    if (t !== 'r' && u.wood + L * (t === 'k' ? 2 : 1) > WOOD_MAX + 1e-9) return '木條用完了（最多 6 m）';
+    return null;
+  }
+  function analyze(d) {
+    const u = usage(d);
+    let weight = 0, floors = 0, blocks = 0, lvlSum = 0, badMass = 0;
+    const byKey = new Map();
+    for (const m of d.members) {
+      const L = lenCells(m.a, m.b), mat = MAT[m.t];
+      weight += L * CELL * mat.gpm + 2 * mat.glue;
+      if (isBeam(m)) floors = Math.max(floors, xy(m.a)[1]);
+      byKey.set(key(m.a, m.b), m);
+    }
+    for (const [k, c] of Object.entries(d.masses || {})) {
+      const m = byKey.get(k);
+      if (!m || !isBeam(m) || c > 2) { badMass++; continue; }
+      blocks += c; lvlSum += c * xy(m.a)[1];
+    }
+    const dampers = [];
+    for (const [k, i] of Object.entries(d.dampers || {})) {
+      const m = byKey.get(k);
+      if (!m || !isBeam(m) || !(i in DAMP_LEN) || (xy(m.a)[1] === 1 && Math.min(xy(m.a)[0], xy(m.b)[0]) === 1)) { badMass++; continue; }
+      blocks++; lvlSum += xy(m.a)[1];
+      weight += DAMP_LEN[i] * MAT.r.gpm + 2 * MAT.r.glue;
+      dampers.push({ key: k, i, f: dampFreq(i) });
+    }
+    if (dampers.length > DAMP_MAX) badMass++;
+    // connectivity from the ground
+    const adj = new Map();
+    for (const m of d.members) {
+      if (!adj.has(m.a)) adj.set(m.a, []); if (!adj.has(m.b)) adj.set(m.b, []);
+      adj.get(m.a).push(m.b); adj.get(m.b).push(m.a);
+    }
+    const seen = new Set(), q = [];
+    for (const n of adj.keys()) if (xy(n)[1] === 0) { seen.add(n); q.push(n); }
+    while (q.length) { const n = q.pop(); for (const o of adj.get(n)) if (!seen.has(o)) { seen.add(o); q.push(o); } }
+    let floating = 0;
+    for (const m of d.members) if (!seen.has(m.a)) floating++;
+    const invalid = d.members.filter(m => validPair(m.a, m.b) || !MAT[m.t]).length;
+    const avgLevel = blocks ? lvlSum / blocks : 0;
+    const checks = [
+      { id: 'floors', label: '3 到 6 層樓', detail: floors + ' 層', ok: floors >= FLOOR_MIN && floors <= MAXF },
+      { id: 'blocks', label: '質量塊 4 到 12 塊（含阻尼器）', detail: blocks + ' 塊', ok: blocks >= BLOCK_MIN && blocks <= BLOCK_MAX && !badMass },
+      { id: 'ground', label: '每根構件都連到地面', detail: floating ? floating + ' 根懸空' : '', ok: d.members.length > 0 && floating === 0 },
+      { id: 'door', label: '一樓大門保持暢通', detail: '', ok: invalid === 0 },
+      { id: 'mat', label: '材料沒有超量', detail: '', ok: u.wood <= WOOD_MAX + 1e-9 && u.rope <= ROPE_MAX + 1e-9 },
+    ];
+    return { checks, ok: checks.every(c => c.ok), floors, blocks, avgLevel, heightBonus: 1 + avgLevel / MAXF, weight, wood: u.wood, rope: u.rope, dampers };
+  }
+  function score(st, pga) {
+    // rounded so the formula shown to students divides exactly
+    const perf = Math.round((pga / 980) * st.blocks * st.heightBonus * 100) / 100;
+    const price = Math.round(st.weight / W0 * 100) / 100;
+    return { perf, price, cp: price > 0 ? perf / price : 0 };
+  }
+
+  function createRunner(d, opts = {}) {
+    const N = [], idx = new Map();
+    const node = n => {
+      if (!idx.has(n)) {
+        const [x, y] = xy(n);
+        idx.set(n, N.length);
+        N.push({ n, x0: x * CELL, y0: y * CELL, x: x * CELL, y: y * CELL, vx: 0, vy: 0, th: 0, w: 0, m: NODE_KG, kr: 0, fx: 0, fy: 0, tq: 0,
+          anchored: y === 0, base: y === 0, up: 0, blocks: 0, cr: 0 });
+      }
+      return idx.get(n);
+    };
+    const M = d.members.map(m => {
+      const mat = MAT[m.t], a = node(m.a), b = node(m.b), A = N[a], B = N[b];
+      const L0 = Math.hypot(B.x0 - A.x0, B.y0 - A.y0);
+      const half = L0 * mat.gpm / 2000 + mat.glue / 1000;
+      A.m += half; B.m += half; A.kr += mat.kr; B.kr += mat.kr;
+      const c = (d.masses || {})[key(m.a, m.b)] || 0;
+      if (c && isBeam(m)) { A.m += c * BLOCK_KG / 2; B.m += c * BLOCK_KG / 2; A.blocks += c; B.blocks += c; }
+      return { a, b, t: m.t, key: key(m.a, m.b), L0, k: mat.EA / L0, kr: mat.kr, mcap: mat.mcap, pcr: mat.pcr / (L0 * L0), tcap: mat.tcap,
+        psi0: Math.atan2(B.y0 - A.y0, B.x0 - A.x0), hingeA: false, hingeB: false, broken: false, N: 0, Ma: 0, Mb: 0, util: 0, blocks: isBeam(m) ? c : 0, c: 0 };
+    });
+    // lockDampers treats each damper block as fixed to its beam (used to measure the building's own frequency)
+    const DP = [];
+    for (const [k, li] of Object.entries(d.dampers || {})) {
+      const m = M.find(x => x.key === k);
+      if (!m || m.t === 'r' || !(li in DAMP_LEN)) continue;
+      const A = N[m.a], B = N[m.b];
+      m.damp = true;
+      if (opts.lockDampers) { A.m += BLOCK_KG / 2; B.m += BLOCK_KG / 2; continue; }
+      const Lp = DAMP_LEN[li], hx = (A.x0 + B.x0) / 2, hy = (A.y0 + B.y0) / 2;
+      DP.push({ m, a: m.a, b: m.b, Lp, x0: hx, y0: hy - Lp, x: hx, y: hy - Lp, vx: 0, vy: 0, fx: 0, fy: 0,
+        k: MAT.r.EA / Lp, c: 2 * DAMP_ZETA * BLOCK_KG * Math.sqrt(G / Lp) });
+    }
+    for (const m of M) m.c = 2 * 0.15 * Math.sqrt(m.k * Math.min(N[m.a].m, N[m.b].m));
+    for (const p of N) p.cr = 2 * 0.3 * Math.sqrt(Math.max(p.kr, 0.1) * J);
+    const anchorsUsed = N.filter(p => p.base).length;
+    const upper = N.filter(p => p.y0 > 0), roofY = upper.length ? Math.max(...upper.map(p => p.y0)) : 0, roof = upper.filter(p => p.y0 === roofY);
+
+    const plan = [{ kind: 'gravity', dur: opts.free || GRAV_T, pga: 0 }];
+    if (!opts.free) for (const pga of PGAS) { plan.push({ kind: 'quake', dur: QUAKE_T, pga }); plan.push({ kind: 'settle', dur: SETTLE_T, pga }); }
+    const R = {
+      nodes: N, members: M, dampers: DP, roof, peak: { ratio: 0, freq: 0 }, t: 0, phaseT: 0, pi: 0, ag: 0, freq: 0, done: false, events: [],
+      rounds: PGAS.map(p => ({ pga: p, status: 'wait' })), fail: null, passed: 0, after: 0,
+      get phase() { return this.fail ? { kind: 'after', pga: this.fail.pga } : plan[this.pi]; },
+    };
+    let steps = 0;
+
+    function physics(ag, gs) {
+      for (let i = 0; i < N.length; i++) { const p = N[i]; p.fx = -p.m * ag; p.fy = -p.m * G * gs; p.tq = 0; }
+      for (let i = 0; i < M.length; i++) {
+        const m = M[i]; if (m.broken) continue;
+        const A = N[m.a], B = N[m.b];
+        const dx = B.x - A.x, dy = B.y - A.y, L2 = dx * dx + dy * dy, L = Math.sqrt(L2), ux = dx / L, uy = dy / L;
+        let n = m.k * (L - m.L0);
+        let f = n + m.c * ((B.vx - A.vx) * ux + (B.vy - A.vy) * uy);
+        if (m.t === 'r' && n < 0) { n = 0; f = 0; }
+        A.fx += f * ux; A.fy += f * uy; B.fx -= f * ux; B.fy -= f * uy;
+        m.N += (n - m.N) * FILT;
+        if (m.kr > 0) {
+          let dpsi = Math.atan2(dy, dx) - m.psi0;
+          if (dpsi > Math.PI) dpsi -= 2 * Math.PI; else if (dpsi < -Math.PI) dpsi += 2 * Math.PI;
+          const Ma = m.hingeA ? 0 : m.kr * (A.th - dpsi);
+          const Mb = m.hingeB ? 0 : m.kr * (B.th - dpsi);
+          A.tq -= Ma; B.tq -= Mb;
+          const s = (Ma + Mb) / L2;
+          A.fx += s * dy; A.fy -= s * dx; B.fx -= s * dy; B.fy += s * dx;
+          m.Ma += (Ma - m.Ma) * FILT; m.Mb += (Mb - m.Mb) * FILT;
+        }
+      }
+      for (let i = 0; i < DP.length; i++) {
+        const q = DP[i];
+        if (q.m.broken) { q.fx = -BLOCK_KG * ag; q.fy = -BLOCK_KG * G * gs; continue; }
+        const A = N[q.a], B = N[q.b];
+        const hx = (A.x + B.x) / 2, hy = (A.y + B.y) / 2;
+        const dx = q.x - hx, dy = q.y - hy, L = Math.sqrt(dx * dx + dy * dy) || 1e-9;
+        const T = Math.max(0, q.k * (L - q.Lp));
+        let fx = -T * dx / L - q.c * (q.vx - (A.vx + B.vx) / 2), fy = -T * dy / L - q.c * (q.vy - (A.vy + B.vy) / 2);
+        // rubber stoppers keep the swing within the floor
+        const over = Math.abs(dx) - DAMP_STROKE * q.Lp;
+        if (over > 0) fx -= Math.sign(dx) * BUMPER_K * over;
+        q.fx = fx - BLOCK_KG * ag; q.fy = fy - BLOCK_KG * G * gs;
+        A.fx -= fx / 2; A.fy -= fy / 2; B.fx -= fx / 2; B.fy -= fy / 2;
+      }
+      for (let i = 0; i < DP.length; i++) {
+        const q = DP[i];
+        q.vx += q.fx / BLOCK_KG * DT; q.vy += q.fy / BLOCK_KG * DT; q.x += q.vx * DT; q.y += q.vy * DT;
+        if (q.y < 0) { q.y = 0; if (q.vy < 0) q.vy = 0; q.vx *= 0.98; }
+      }
+      for (let i = 0; i < N.length; i++) {
+        const p = N[i];
+        if (p.anchored) { p.up += (p.fy - p.up) * FILT; continue; }
+        p.vx += (p.fx / p.m - CN * p.vx) * DT; p.vy += (p.fy / p.m - CN * p.vy) * DT;
+        p.x += p.vx * DT; p.y += p.vy * DT;
+        p.w += ((p.tq - p.cr * p.w) / J) * DT; p.th += p.w * DT;
+        if (p.y < 0) { p.y = 0; if (p.vy < 0) p.vy = 0; p.vx *= 0.98; }
+      }
+    }
+    function ev(type, extra) { R.events.push(Object.assign({ type, t: R.t, pga: R.phase.pga }, extra)); }
+    function inspect(kind) {
+      for (const m of M) {
+        if (m.broken) continue;
+        if (m.t !== 'r' && m.N < -m.pcr) { m.broken = true; ev('buckle', { m: m.key }); continue; }
+        if (m.N > m.tcap) { m.broken = true; ev(m.t === 'r' ? 'snap' : 'pull', { m: m.key }); continue; }
+        if (m.kr > 0) {
+          if (!m.hingeA && Math.abs(m.Ma) > m.mcap) { m.hingeA = true; ev('hinge', { m: m.key }); }
+          if (!m.hingeB && Math.abs(m.Mb) > m.mcap) { m.hingeB = true; ev('hinge', { m: m.key }); }
+        }
+        const ax = m.N < 0 ? (m.t === 'r' ? 0 : -m.N / m.pcr) : m.N / m.tcap;
+        const bend = m.kr > 0 ? Math.max(m.hingeA ? 0 : Math.abs(m.Ma), m.hingeB ? 0 : Math.abs(m.Mb)) / m.mcap : 0;
+        m.util = Math.min(1, Math.max(ax, bend));
+      }
+      let detached = 0;
+      for (const p of N) {
+        if (p.anchored && p.up > ANCHOR_CAP) { p.anchored = false; ev('uplift', { n: p.n }); }
+        if (p.base && !p.anchored) detached++;
+      }
+      if (R.fail || kind === 'after') return;
+      if (kind === 'quake' && roof.length && R.phase.pga) {
+        let s = 0; for (const p of roof) s += p.x - p.x0;
+        const ratio = Math.abs(s / roof.length) / R.phase.pga;
+        if (ratio > R.peak.ratio) { R.peak.ratio = ratio; R.peak.freq = R.freq; }
+      }
+      let why = null;
+      if (M.some(m => m.broken && (m.blocks > 0 || m.damp))) why = 'mass';
+      else if (N.some(p => p.y0 > 0 && (p.y0 - p.y > 0.05 || Math.abs(p.x - p.x0) > 0.3))) why = 'collapse';
+      else if (anchorsUsed && detached * 2 >= anchorsUsed) why = 'uplift';
+      if (why) failNow(why);
+    }
+    function failNow(why) {
+      const ph = plan[R.pi];
+      R.fail = { why, pga: ph.pga, kind: ph.kind };
+      const r = R.rounds.find(x => x.pga === ph.pga);
+      if (r) r.status = 'fail';
+      R.after = 0;
+    }
+    function nextPhase() {
+      const ph = plan[R.pi];
+      if (ph.kind === 'settle') {
+        let drift = 0;
+        for (const p of N) if (p.y0 > 0) drift = Math.max(drift, Math.abs(p.x - p.x0));
+        if (drift > 0.1) { failNow('drift'); return; }
+        R.rounds.find(x => x.pga === ph.pga).status = 'pass';
+        R.passed = ph.pga;
+      }
+      R.pi++; R.phaseT = 0;
+      if (R.pi >= plan.length) { R.done = true; return; }
+      const nx = plan[R.pi];
+      if (nx.kind === 'quake') R.rounds.find(x => x.pga === nx.pga).status = 'run';
+    }
+    function groundAccel(ph, t) {
+      if (ph.kind !== 'quake') { R.freq = 0; return 0; }
+      const f0 = 0.8, f1 = 6, T = QUAKE_T, r = Math.log(f1 / f0);
+      const phase = 2 * Math.PI * f0 * T / r * (Math.exp(r * t / T) - 1);
+      R.freq = f0 * Math.exp(r * t / T);
+      const ramp = 0.75, e = t < ramp ? Math.sin(t / ramp * Math.PI / 2) ** 2 : t > T - ramp ? Math.sin((T - t) / ramp * Math.PI / 2) ** 2 : 1;
+      return ph.pga / 100 * e * Math.sin(phase);
+    }
+    R.advance = function (sec) {
+      let n = Math.round(sec / DT);
+      while (n-- > 0 && !R.done) {
+        const ph = R.phase;
+        let gs = 1;
+        if (ph.kind === 'gravity') gs = Math.min(1, R.phaseT / 0.6);
+        R.ag = R.fail ? 0 : opts.agFn ? opts.agFn(R.t) : groundAccel(ph, R.phaseT);
+        physics(R.ag, gs);
+        R.t += DT; R.phaseT += DT; steps++;
+        if (steps % 125 === 0) inspect(R.fail ? 'after' : ph.kind);
+        if (R.fail) { R.after += DT; if (R.after >= AFTER_T) { R.done = true; R.ag = 0; } continue; }
+        if (R.phaseT >= ph.dur) nextPhase();
+      }
+      return R;
+    };
+    R.runAll = function () { while (!R.done) R.advance(0.5); return R; };
+    R.summary = function () {
+      const counts = {};
+      for (const e of R.events) counts[e.type] = (counts[e.type] || 0) + 1;
+      return { pga: R.passed, fail: R.fail, peakFreq: R.peak.freq, rounds: R.rounds.map(r => ({ ...r, status: r.status === 'run' || r.status === 'wait' ? (R.fail ? 'skip' : r.status) : r.status })), counts, firstDamage: R.events[0] || null };
+    };
+    return R;
+  }
+
+  // tap the house sideways and count roof swings: the building's natural frequency (Hz), or null if it can't stand
+  function naturalFreq(d) {
+    const R = createRunner(d, { lockDampers: true, free: 4 });
+    R.advance(1.2);
+    if (R.fail || !R.roof.length) return null;
+    for (const p of R.nodes) if (!p.anchored && p.y0 > 0) p.vx += 0.03 * p.y0 / R.roof[0].y0;
+    const xs = [];
+    for (let i = 0; i < 1500; i++) {
+      R.advance(0.001); if (R.fail) return null;
+      let s = 0; for (const p of R.roof) s += p.x - p.x0; xs.push(s / R.roof.length);
+    }
+    const mean = xs.reduce((a, b) => a + b, 0) / xs.length;
+    const amp = Math.max(...xs.map(v => Math.abs(v - mean))), th = amp * 0.15;
+    let sign = 0, cross = 0, first = -1, last = -1;
+    xs.forEach((v, i) => {
+      const dv = v - mean; if (Math.abs(dv) < th) return;
+      const sg = dv > 0 ? 1 : -1;
+      if (sign && sg !== sign) { cross++; if (first < 0) first = i; last = i; }
+      sign = sg;
+    });
+    if (cross < 3) return null;
+    return (cross - 1) / 2 / ((last - first) * 0.001);
+  }
+
+  return { COLS, MAXF, CELL, PGAS, MAT, W0, WOOD_MAX, ROPE_MAX, BLOCK_MAX, DAMP_LEN, DAMP_MAX, id, xy, key, lenCells, isBeam, validPair, canPlace, canHang, dampFreq, totalBlocks, analyze, score, createRunner, naturalFreq };
+})();
+// ===== SIM-END =====
+
+// ---------- design codec ----------
+const Codec = {
+  pack(d) {
+    const m = d.members.map(x => x.a.toString(36) + x.b.toString(36) + x.t).join('');
+    const pair = (o, f) => Object.entries(o || {}).filter(([, c]) => f(c)).map(([kk, c]) => kk.split('-').map(n => (+n).toString(36)).join('') + c).join('');
+    return { m, k: pair(d.masses, c => c > 0), p: pair(d.dampers, () => true) };
+  },
+  unpack(p) {
+    const members = [], masses = {}, dampers = {};
+    for (let i = 0; i + 2 < p.m.length; i += 3) members.push({ a: parseInt(p.m[i], 36), b: parseInt(p.m[i + 1], 36), t: p.m[i + 2] });
+    const read = (s, into) => { for (let i = 0; i + 2 < (s || '').length; i += 3) into[SIM.key(parseInt(s[i], 36), parseInt(s[i + 1], 36))] = +s[i + 2]; };
+    read(p.k, masses); read(p.p, dampers);
+    return { members, masses, dampers };
+  },
+  encode(obj) { return 'KZ1.' + btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); },
+  decode(s) {
+    s = s.trim(); if (!s.startsWith('KZ1.')) throw new Error('格式不對');
+    let b = s.slice(4).replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '=';
+    return JSON.parse(decodeURIComponent(escape(atob(b))));
+  },
+};
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } },
+};
+const fmt = (n, d = 1) => (Math.round(n * 10 ** d) / 10 ** d).toFixed(d);
+const mmss = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+const intensity = pga => pga >= 800 ? '約震度 7 級' : pga >= 440 ? '約震度 6 強' : pga >= 250 ? '約震度 6 弱' : '約震度 5 強';
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v); }
+  for (const c of kids) if (c != null) e.append(c);
+  return e;
+}
+let toastTimer;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200); }
+function show(id) { $('#' + id).hidden = false; }
+function hide(id) { $('#' + id).hidden = true; }
+document.addEventListener('click', e => { const c = e.target.closest('[data-close]'); if (c) hide(c.dataset.close); });
+
+function sampleDesign() {
+  const d = { members: [], masses: {}, dampers: {} };
+  const add = (x1, y1, x2, y2, t = 'w') => { const a = SIM.id(x1, y1), b = SIM.id(x2, y2); d.members.push({ a: Math.min(a, b), b: Math.max(a, b), t }); };
+  for (let x = 0; x < 4; x++) for (let y = 0; y < 4; y++) add(x, y, x, y + 1, y === 0 && (x === 0 || x === 3) ? 'k' : 'w');
+  for (let y = 1; y <= 4; y++) for (let x = 0; x < 3; x++) add(x, y, x + 1, y);
+  for (let y = 0; y < 4; y++) { add(0, y, 1, y + 1, 'w'); add(1, y, 0, y + 1, y === 0 ? 'w' : 'r'); add(3, y, 2, y + 1, 'w'); add(2, y, 3, y + 1, 'r'); }
+  d.masses[SIM.key(SIM.id(0, 4), SIM.id(1, 4))] = 2; d.masses[SIM.key(SIM.id(1, 4), SIM.id(2, 4))] = 2; d.masses[SIM.key(SIM.id(2, 4), SIM.id(3, 4))] = 2;
+  d.dampers[SIM.key(SIM.id(1, 4), SIM.id(2, 4))] = 3;
+  return d;
+}
+const blankDesign = () => ({ members: [], masses: {}, dampers: {} });
+
+// ---------- state ----------
+const TIME_LIMIT = 300;
+const TOOLS = [
+  { t: 'w', nm: '木條', hint: '能拉也能壓，細長時受壓會彎', key: '1' },
+  { t: 'k', nm: '粗木條', hint: '兩根黏在一起，強很多也重一倍', key: '2' },
+  { t: 'r', nm: '棉繩', hint: '很輕，只能拉不能推', key: '3' },
+  { t: 'mass', nm: '質量塊', hint: '點橫梁放上去，最多疊 2 塊', key: '4' },
+  { t: 'damp', nm: '懸吊阻尼器', hint: '把質量塊吊在橫梁下，再點一次換繩長', key: '5' },
+  { t: 'erase', nm: '橡皮擦', hint: '點構件、質量塊或阻尼器刪除', key: '6' },
+];
+const S = {
+  phase: 'intro', mode: 'timed', tool: 'w', design: sampleDesign(), undo: [],
+  timeLeft: TIME_LIMIT, timerId: null, buildStart: 0, buildSec: 0,
+  runner: null, speed: 1, hoverNode: null, dragFrom: null, pickFrom: null, pointer: null,
+  debris: [], seen: new Set(), trace: [], result: null,
+};
+
+// ---------- tools UI ----------
+function toolIcon(t) {
+  const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
+  s.setAttribute('width', '34'); s.setAttribute('height', '34'); s.setAttribute('viewBox', '0 0 34 34'); s.setAttribute('aria-hidden', 'true');
+  const html = {
+    w: '<line x1="6" y1="28" x2="28" y2="6" stroke="var(--wood-edge)" stroke-width="7" stroke-linecap="round"/><line x1="6" y1="28" x2="28" y2="6" stroke="var(--wood)" stroke-width="4.5" stroke-linecap="round"/>',
+    k: '<line x1="6" y1="28" x2="28" y2="6" stroke="var(--wood-edge)" stroke-width="11" stroke-linecap="round"/><line x1="6" y1="28" x2="28" y2="6" stroke="var(--wood-thick)" stroke-width="8" stroke-linecap="round"/>',
+    r: '<path d="M6 28 C 14 22, 20 14, 28 6" fill="none" stroke="var(--rope-edge)" stroke-width="2.5" stroke-dasharray="3 2"/>',
+    mass: '<rect x="5" y="17" width="24" height="11" rx="2" fill="var(--steel)"/><rect x="8" y="7" width="18" height="9" rx="2" fill="var(--steel-hi)"/>',
+    damp: '<line x1="4" y1="6" x2="30" y2="6" stroke="var(--wood-edge)" stroke-width="4" stroke-linecap="round"/><line x1="17" y1="6" x2="21" y2="20" stroke="var(--rope-edge)" stroke-width="2" stroke-dasharray="3 2"/><rect x="14" y="20" width="14" height="9" rx="2" fill="var(--steel)" transform="rotate(-14 21 24)"/><path d="M10 24 q-3 -4 0 -8" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>',
+    erase: '<path d="M8 22 L18 8 L28 16 L20 28 H12 Z" fill="var(--danger-soft)" stroke="var(--danger)" stroke-width="2" stroke-linejoin="round"/>',
+  }[t];
+  s.innerHTML = html; return s;
+}
+function renderTools() {
+  const box = $('#tools'); box.textContent = '';
+  for (const T of TOOLS) {
+    const b = el('button', { class: 'tool', 'aria-pressed': String(S.tool === T.t), onclick: () => setTool(T.t) },
+      toolIcon(T.t), el('span', {}, el('span', { class: 'nm', text: T.nm }), el('span', { class: 'hint', text: T.hint })), el('kbd', { text: T.key }));
+    box.append(b);
+  }
+}
+function setTool(t) { S.tool = t; S.pickFrom = null; renderTools(); draw(); }
+
+// ---------- edits ----------
+function snapshot() { S.undo.push(JSON.stringify(S.design)); if (S.undo.length > 100) S.undo.shift(); }
+function editable() { return S.phase === 'build'; }
+function findMember(a, b) { const k = SIM.key(a, b); return S.design.members.findIndex(m => SIM.key(m.a, m.b) === k); }
+function addMember(a, b, t) {
+  const bad = SIM.canPlace(S.design, a, b, t);
+  if (bad) { toast(bad); return; }
+  const i = findMember(a, b);
+  if (i >= 0 && S.design.members[i].t === t) { toast('這裡已經有' + SIM.MAT[t].name + '了'); return; }
+  snapshot();
+  const m = { a: Math.min(a, b), b: Math.max(a, b), t };
+  if (i >= 0) { S.design.members[i] = m; if (t === 'r') { delete S.design.masses[SIM.key(a, b)]; delete S.design.dampers[SIM.key(a, b)]; } }
+  else S.design.members.push(m);
+  changed();
+}
+function removeMember(i) {
+  snapshot();
+  const m = S.design.members.splice(i, 1)[0];
+  delete S.design.masses[SIM.key(m.a, m.b)];
+  delete S.design.dampers[SIM.key(m.a, m.b)];
+  changed();
+}
+function addMass(i) {
+  const m = S.design.members[i];
+  if (!SIM.isBeam(m)) { toast('質量塊只能放在木條橫梁上'); return; }
+  const k = SIM.key(m.a, m.b), c = S.design.masses[k] || 0;
+  if (c >= 2) { toast('這根橫梁已經疊 2 塊了'); return; }
+  if (SIM.totalBlocks(S.design) >= SIM.BLOCK_MAX) { toast('質量塊最多 12 塊（阻尼器也算一塊）'); return; }
+  snapshot(); S.design.masses[k] = c + 1; changed();
+}
+function removeMass(k) { snapshot(); S.design.masses[k]--; if (!S.design.masses[k]) delete S.design.masses[k]; changed(); }
+function addDamper(i) {
+  const m = S.design.members[i], k = SIM.key(m.a, m.b), cur = S.design.dampers[k];
+  if (cur != null) {
+    // cycle to the next rope length that still fits the rope budget
+    const others = { ...S.design, dampers: { ...S.design.dampers } }; delete others.dampers[k];
+    let next = (cur + 1) % SIM.DAMP_LEN.length;
+    while (next !== cur && SIM.canHang(others, m, next) === '棉繩不夠吊阻尼器了') next = (next + 1) % SIM.DAMP_LEN.length;
+    if (next === cur) { toast('棉繩不夠換更長的繩子了'); return; }
+    snapshot(); S.design.dampers[k] = next; changed();
+    toast(`繩長 ${fmt(SIM.DAMP_LEN[next] * 100, 1)} cm，擺動頻率 ${fmt(SIM.dampFreq(next), 1)} Hz`);
+    return;
+  }
+  const bad = SIM.canHang(S.design, m, 2);
+  if (bad) { toast(bad); return; }
+  snapshot(); S.design.dampers[k] = 2; changed();
+  toast(`吊上阻尼器：擺動頻率 ${fmt(SIM.dampFreq(2), 1)} Hz，再點一次換繩長`);
+}
+function removeDamper(k) { snapshot(); delete S.design.dampers[k]; changed(); }
+function changed() { store.set('kzw-design', S.design); scheduleFreq(); renderSheet(); draw(); }
+// natural frequency takes a short simulation, so it runs a moment after the last edit
+let freqTimer = 0;
+const freqCache = new Map();
+function scheduleFreq() {
+  clearTimeout(freqTimer);
+  const k = JSON.stringify([S.design.members, S.design.masses, Object.keys(S.design.dampers)]);
+  if (freqCache.has(k)) { S.natFreq = freqCache.get(k); return; }
+  S.natFreq = undefined;
+  freqTimer = setTimeout(() => {
+    const f = SIM.totalBlocks(S.design) && S.design.members.length ? SIM.naturalFreq(S.design) : null;
+    freqCache.set(k, f); if (freqCache.size > 200) freqCache.delete(freqCache.keys().next().value);
+    S.natFreq = f;
+    if (!S.runner) renderSheet();
+  }, 450);
+}
+$('#btnUndo').onclick = () => { if (!editable() || !S.undo.length) return; S.design = JSON.parse(S.undo.pop()); changed(); };
+$('#btnClear').onclick = () => { if (!editable() || !S.design.members.length) return; snapshot(); S.design = blankDesign(); changed(); toast('已清空，可以按「復原」救回來'); };
+
+// ---------- canvas geometry ----------
+const cv = $('#cv'), ctx = cv.getContext('2d');
+const sv = $('#seis'), sctx = sv.getContext('2d');
+let G = { W: 0, H: 0, cell: 60, ox: 0, gy: 0 };
+let TK = {};
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function readTokens() {
+  const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
+  TK = {}; for (const n of ['surface', 'panel', 'grid', 'grid-strong', 'ink', 'muted', 'faint', 'accent', 'accent-ink', 'wood', 'wood-edge', 'wood-thick', 'rope', 'rope-edge', 'steel', 'steel-hi', 'glue', 'ok', 'danger', 'pit', 'plate', 'line']) TK[n] = g('--' + n);
+}
+function resize() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  for (const c of [cv, sv]) { const r = c.getBoundingClientRect(); c.width = Math.max(1, r.width * dpr); c.height = Math.max(1, r.height * dpr); c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); }
+  const r = cv.getBoundingClientRect();
+  const top = 28, bottom = 96;
+  G.W = r.width; G.H = r.height;
+  G.cell = Math.max(30, Math.min((G.H - top - bottom) / SIM.MAXF, (G.W - 160) / 3, 96));
+  G.ox = (G.W - 3 * G.cell) / 2 + 8; G.gy = G.H - bottom;
+  readTokens(); draw(); drawSeis();
+}
+const nodePx = n => { const [x, y] = SIM.xy(n); return [G.ox + x * G.cell, G.gy - y * G.cell]; };
+const mPx = (xm, ym) => [G.ox + xm / SIM.CELL * G.cell, G.gy - ym / SIM.CELL * G.cell];
+function mix(h1, h2, t) {
+  const p = h => { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+  try { const a = p(h1), b = p(h2); return 'rgb(' + a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',') + ')'; } catch { return h1; }
+}
+
+// ---------- drawing ----------
+function shakeOffset() {
+  if (!S.runner || reduceMotion) return 0;
+  const R = S.runner, ph = R.phase;
+  if (ph.kind !== 'quake' || R.fail) return 0;
+  const w = 2 * Math.PI * Math.max(R.freq, 1);
+  return Math.max(-0.45, Math.min(0.45, -R.ag / (w * w) / SIM.CELL * 1.6)) * G.cell;
+}
+function draw() {
+  if (!G.W) return;
+  const c = ctx, W = G.W, H = G.H, cell = G.cell;
+  c.clearRect(0, 0, W, H);
+  c.fillStyle = TK.surface; c.fillRect(0, 0, W, H);
+  // graph paper
+  c.lineWidth = 1;
+  const minor = cell / 4;
+  c.strokeStyle = TK.grid; c.beginPath();
+  for (let x = G.ox % minor; x < W; x += minor) { c.moveTo(Math.round(x) + .5, 0); c.lineTo(Math.round(x) + .5, G.gy); }
+  for (let y = G.gy % minor; y < G.gy; y += minor) { c.moveTo(0, Math.round(y) + .5); c.lineTo(W, Math.round(y) + .5); }
+  c.stroke();
+  c.strokeStyle = TK['grid-strong']; c.beginPath();
+  for (let x = G.ox % cell; x < W; x += cell) { c.moveTo(Math.round(x) + .5, 0); c.lineTo(Math.round(x) + .5, G.gy); }
+  for (let y = G.gy; y > 0; y -= cell) { c.moveTo(0, Math.round(y) + .5); c.lineTo(W, Math.round(y) + .5); }
+  c.stroke();
+  // floor labels + scale
+  c.fillStyle = TK.muted; c.font = `500 ${Math.round(cell * 0.24)}px ${getComputedStyle(document.body).getPropertyValue('--f-hand') || 'serif'}`;
+  c.textAlign = 'right'; c.textBaseline = 'middle';
+  for (let f = 1; f <= SIM.MAXF; f++) c.fillText(f + 'F', G.ox - 18, G.gy - (f - 0.5) * cell);
+  c.textAlign = 'left';
+  const sx = G.ox + 3 * cell + 22;
+  c.strokeStyle = TK.muted; c.beginPath(); c.moveTo(sx, G.gy - cell); c.lineTo(sx, G.gy); c.moveTo(sx - 4, G.gy - cell); c.lineTo(sx + 4, G.gy - cell); c.moveTo(sx - 4, G.gy); c.lineTo(sx + 4, G.gy); c.stroke();
+  c.fillText('10 cm', sx + 8, G.gy - cell / 2);
+
+  const off = shakeOffset();
+  c.save(); c.translate(off, 0);
+  // shake table
+  const tx0 = G.ox - cell * 0.9, tx1 = G.ox + 3 * cell + cell * 0.9;
+  c.fillStyle = TK.plate; c.fillRect(G.ox - cell * 0.45, G.gy, 3 * cell + cell * 0.9, 7);
+  const ty = G.gy + 7;
+  c.save(); c.beginPath(); c.rect(tx0, ty, tx1 - tx0, 20); c.clip();
+  c.fillStyle = TK.accent; c.fillRect(tx0, ty, tx1 - tx0, 20);
+  c.fillStyle = TK.ink; for (let x = tx0 - 40; x < tx1 + 40; x += 22) { c.beginPath(); c.moveTo(x, ty + 20); c.lineTo(x + 11, ty + 20); c.lineTo(x + 31, ty); c.lineTo(x + 20, ty); c.closePath(); c.fill(); }
+  c.restore();
+  c.fillStyle = TK.muted; c.textAlign = 'center'; c.font = `500 12px ${'"Noto Sans TC",sans-serif'}`;
+  c.fillText('振動台', (tx0 + tx1) / 2, ty + 36);
+  c.restore();
+  // pit (static)
+  c.fillStyle = TK.pit; c.fillRect(G.ox - cell * 1.1, G.gy + 27, 3 * cell + cell * 2.2, 6);
+
+  c.save(); c.translate(off, 0);
+  if (S.runner) drawLive(c); else drawDesign(c);
+  drawDebris(c);
+  c.restore();
+}
+function strokeMember(c, x1, y1, x2, y2, t, color, alpha = 1) {
+  const cell = G.cell;
+  c.globalAlpha = alpha; c.lineCap = 'round';
+  if (t === 'r') {
+    c.strokeStyle = color || TK['rope-edge']; c.lineWidth = Math.max(2, cell * 0.035); c.setLineDash([5, 3]);
+    c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); c.setLineDash([]);
+  } else {
+    const w = t === 'k' ? cell * 0.16 : cell * 0.085;
+    c.strokeStyle = TK['wood-edge']; c.lineWidth = w + 3; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+    c.strokeStyle = color || (t === 'k' ? TK['wood-thick'] : TK.wood); c.lineWidth = w; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+    if (t === 'k') { c.strokeStyle = TK['wood-edge']; c.globalAlpha = alpha * .5; c.lineWidth = 1; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); }
+  }
+  c.globalAlpha = 1;
+}
+function drawBlocks(c, x1, y1, x2, y2, count, t) {
+  const cell = G.cell, ang = Math.atan2(y2 - y1, x2 - x1), cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+  const bw = cell * 0.62, bh = cell * 0.24, lift = (t === 'k' ? cell * 0.08 : cell * 0.045) + 1.5;
+  c.save(); c.translate(cx, cy); c.rotate(ang);
+  for (let i = 0; i < count; i++) {
+    const y = -lift - (i + 1) * bh - i * 1.5;
+    c.fillStyle = TK.steel; c.fillRect(-bw / 2, y, bw, bh);
+    c.fillStyle = TK['steel-hi']; c.fillRect(-bw / 2, y, bw, Math.max(2, bh * 0.18));
+  }
+  c.restore();
+}
+function drawDamper(c, hx, hy, px, py, label) {
+  const cell = G.cell, bw = cell * 0.5, bh = cell * 0.22, ang = Math.atan2(px - hx, py - hy);
+  c.strokeStyle = TK['rope-edge']; c.lineWidth = Math.max(1.5, cell * 0.03); c.setLineDash([4, 2]);
+  c.beginPath(); c.moveTo(hx, hy); c.lineTo(px, py); c.stroke(); c.setLineDash([]);
+  c.save(); c.translate(px, py); c.rotate(-ang);
+  c.fillStyle = TK.steel; c.fillRect(-bw / 2, 0, bw, bh);
+  c.fillStyle = TK.accent; c.fillRect(-bw / 2, bh - Math.max(2, bh * 0.2), bw, Math.max(2, bh * 0.2));
+  c.restore();
+  c.fillStyle = TK.glue; c.beginPath(); c.arc(hx, hy, 3, 0, Math.PI * 2); c.fill();
+  if (label) {
+    c.fillStyle = TK.muted; c.textAlign = 'left'; c.textBaseline = 'middle';
+    c.font = `700 ${Math.round(cell * 0.18)}px "LXGW WenKai TC",serif`;
+    const tw = c.measureText(label).width, lx = hx + bw / 2 + 4, ly = py + bh / 2, th = cell * 0.24;
+    c.fillStyle = TK.surface; c.globalAlpha = 0.85; c.fillRect(lx - 2, ly - th / 2, tw + 4, th); c.globalAlpha = 1;
+    c.fillStyle = TK.muted; c.fillText(label, lx, ly);
+  }
+}
+function drawGlue(c, pts) { c.fillStyle = TK.glue; for (const [x, y] of pts) { c.beginPath(); c.arc(x, y, Math.max(3, G.cell * 0.06), 0, Math.PI * 2); c.fill(); } }
+function drawDesign(c) {
+  const d = S.design, cell = G.cell, building = S.phase === 'build';
+  // door
+  const [dx0, dy0] = nodePx(SIM.id(1, 1));
+  c.save(); c.setLineDash([6, 5]); c.strokeStyle = TK.faint; c.lineWidth = 1.5; c.strokeRect(dx0 + 6, dy0 + 6, cell - 12, cell - 12); c.restore();
+  c.fillStyle = TK.faint; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.font = `700 ${Math.round(cell * 0.22)}px "LXGW WenKai TC",serif`; c.fillText('大門', dx0 + cell / 2, dy0 + cell / 2);
+  // nodes
+  if (building) {
+    for (let y = 0; y <= SIM.MAXF; y++) for (let x = 0; x < 4; x++) {
+      const n = SIM.id(x, y), [px, py] = nodePx(n);
+      const hot = S.hoverNode === n || S.dragFrom === n || S.pickFrom === n;
+      c.fillStyle = hot ? TK.accent : (y === 0 ? TK.muted : TK.faint);
+      if (y === 0) c.fillRect(px - 4, py - 4, 8, 8); else { c.beginPath(); c.arc(px, py, hot ? 6 : 3, 0, Math.PI * 2); c.fill(); }
+      if (hot) { c.strokeStyle = TK.ink; c.lineWidth = 1.5; c.beginPath(); c.arc(px, py, 9, 0, Math.PI * 2); c.stroke(); }
+    }
+  }
+  const order = [...d.members].sort((a, b) => (a.t === 'r' ? 0 : 1) - (b.t === 'r' ? 0 : 1));
+  const used = new Map();
+  for (const m of order) {
+    const [x1, y1] = nodePx(m.a), [x2, y2] = nodePx(m.b);
+    strokeMember(c, x1, y1, x2, y2, m.t);
+    used.set(m.a, (used.get(m.a) || 0) + 1); used.set(m.b, (used.get(m.b) || 0) + 1);
+  }
+  drawGlue(c, [...used].filter(([, v]) => v >= 2).map(([n]) => nodePx(n)));
+  for (const m of d.members) {
+    const k = SIM.key(m.a, m.b), cnt = d.masses[k], li = d.dampers[k];
+    const [x1, y1] = nodePx(m.a), [x2, y2] = nodePx(m.b);
+    if (cnt) drawBlocks(c, x1, y1, x2, y2, cnt, m.t);
+    if (li != null) { const hx = (x1 + x2) / 2, hy = (y1 + y2) / 2; drawDamper(c, hx, hy, hx, hy + SIM.DAMP_LEN[li] / SIM.CELL * cell, fmt(SIM.dampFreq(li), 1) + ' Hz'); }
+  }
+  // drag preview
+  const from = S.dragFrom ?? S.pickFrom;
+  if (building && from != null && S.hoverNode != null && S.hoverNode !== from && 'wkr'.includes(S.tool)) {
+    const bad = SIM.canPlace(d, from, S.hoverNode, S.tool);
+    const [x1, y1] = nodePx(from), [x2, y2] = nodePx(S.hoverNode);
+    strokeMember(c, x1, y1, x2, y2, S.tool, bad ? TK.danger : null, 0.55);
+  } else if (building && from != null && S.pointer) {
+    const [x1, y1] = nodePx(from);
+    c.strokeStyle = TK.faint; c.setLineDash([4, 4]); c.lineWidth = 1.5; c.beginPath(); c.moveTo(x1, y1); c.lineTo(S.pointer[0], S.pointer[1]); c.stroke(); c.setLineDash([]);
+  }
+}
+function livePos(p) {
+  let dx = p.x - p.x0, dy = p.y - p.y0;
+  const mag = Math.hypot(dx, dy), s = 1 + 3 / (1 + mag / 0.01);
+  return mPx(p.x0 + dx * s, p.y0 + dy * s);
+}
+function drawLive(c) {
+  const R = S.runner, N = R.nodes, cell = G.cell;
+  const P = N.map(livePos);
+  for (const m of R.members) if (m.broken && !S.seen.has(m.key)) {
+    S.seen.add(m.key);
+    const a = P[m.a], b = P[m.b];
+    if (!reduceMotion) S.debris.push({ x1: a[0], y1: a[1], x2: b[0], y2: b[1], t: m.t, vy: -40, vx: (Math.random() - .5) * 60, rot: 0, vr: (Math.random() - .5) * 3, life: 1 });
+  }
+  const order = R.members.filter(m => !m.broken).sort((a, b) => (a.t === 'r' ? 0 : 1) - (b.t === 'r' ? 0 : 1));
+  const used = new Map();
+  for (const m of order) {
+    const a = P[m.a], b = P[m.b];
+    const col = m.t === 'r' ? mix(TK['rope-edge'], TK.danger, m.util) : mix(m.t === 'k' ? TK['wood-thick'] : TK.wood, TK.danger, m.util);
+    strokeMember(c, a[0], a[1], b[0], b[1], m.t, col);
+    used.set(m.a, (used.get(m.a) || 0) + 1); used.set(m.b, (used.get(m.b) || 0) + 1);
+  }
+  drawGlue(c, [...used].filter(([, v]) => v >= 2).map(([i]) => P[i]));
+  // hinges
+  c.strokeStyle = TK.danger; c.lineWidth = 2;
+  for (const m of order) {
+    if (m.kr <= 0) continue;
+    const a = P[m.a], b = P[m.b], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L, r = cell * 0.14;
+    if (m.hingeA) { c.beginPath(); c.arc(a[0] + ux * r, a[1] + uy * r, 4, 0, Math.PI * 2); c.stroke(); }
+    if (m.hingeB) { c.beginPath(); c.arc(b[0] - ux * r, b[1] - uy * r, 4, 0, Math.PI * 2); c.stroke(); }
+  }
+  for (const m of order) if (m.blocks) { const a = P[m.a], b = P[m.b]; drawBlocks(c, a[0], a[1], b[0], b[1], m.blocks, m.t); }
+  for (const q of R.dampers) {
+    if (q.m.broken) { const [px, py] = mPx(q.x, q.y); drawDamper(c, px, py - 1, px, py - 1); continue; }
+    const A = N[q.a], B = N[q.b], a = P[q.a], b = P[q.b], hx = (a[0] + b[0]) / 2, hy = (a[1] + b[1]) / 2;
+    const dx = q.x - (A.x + B.x) / 2, dy = q.y - (A.y + B.y) / 2, L = Math.hypot(dx, dy) || 1, len = q.Lp / SIM.CELL * cell;
+    drawDamper(c, hx, hy, hx + dx / L * len, hy - dy / L * len);
+  }
+  // pulled-out column feet
+  for (let i = 0; i < N.length; i++) if (N[i].base && !N[i].anchored) {
+    const [x, y] = P[i]; c.strokeStyle = TK.danger; c.lineWidth = 2.5;
+    c.beginPath(); c.moveTo(x - 6, G.gy + 2); c.lineTo(x + 6, G.gy - 10); c.moveTo(x + 6, G.gy + 2); c.lineTo(x - 6, G.gy - 10); c.stroke();
+  }
+}
+function drawDebris(c) {
+  for (const d of S.debris) {
+    const mx = (d.x1 + d.x2) / 2, my = (d.y1 + d.y2) / 2;
+    c.save(); c.translate(mx + d.dx || mx, my + d.dy || my); c.rotate(d.rot);
+    const hx = (d.x2 - d.x1) / 2, hy = (d.y2 - d.y1) / 2;
+    strokeMember(c, -hx, -hy, hx, hy, d.t, TK.danger, Math.max(0, d.life));
+    c.restore();
+  }
+}
+function stepDebris(dt) {
+  for (const d of S.debris) {
+    d.vy += 900 * dt; d.dx = (d.dx || 0) + d.vx * dt; d.dy = (d.dy || 0) + d.vy * dt; d.rot += d.vr * dt; d.life -= dt * 0.8;
+    const my = (d.y1 + d.y2) / 2 + d.dy; if (my > G.gy - 4) { d.dy = G.gy - 4 - (d.y1 + d.y2) / 2; d.vy *= -0.2; d.vx *= 0.6; d.vr *= 0.5; }
+  }
+  S.debris = S.debris.filter(d => d.life > 0);
+}
+
+// ---------- seismograph ----------
+function drawSeis() {
+  const r = sv.getBoundingClientRect(), W = r.width, H = r.height, c = sctx;
+  if (!W) return;
+  c.clearRect(0, 0, W, H); c.fillStyle = TK.panel; c.fillRect(0, 0, W, H);
+  c.strokeStyle = TK.grid; c.lineWidth = 1; c.beginPath();
+  for (let x = 0; x < W; x += 20) { c.moveTo(x + .5, 0); c.lineTo(x + .5, H); } c.stroke();
+  c.strokeStyle = TK['grid-strong']; c.beginPath(); c.moveTo(0, H / 2 + .5); c.lineTo(W, H / 2 + .5); c.stroke();
+  const R = S.runner, lx = 150;
+  c.fillStyle = TK.muted; c.font = '700 11px "Noto Sans TC",sans-serif'; c.textBaseline = 'top'; c.textAlign = 'left';
+  c.fillText('地表加速度', 12, 10);
+  c.font = '600 15px "IBM Plex Mono",monospace'; c.fillStyle = TK.ink;
+  if (!R) { c.fillText('等待測試', 12, 30); }
+  else {
+    const ph = R.phase;
+    const label = ph.kind === 'gravity' ? '放上質量塊' : ph.kind === 'after' ? (ph.pga ? ph.pga + ' gal' : '靜載重') : ph.pga + ' gal';
+    c.fillText(label, 12, 28);
+    c.font = '500 11px "Noto Sans TC",sans-serif'; c.fillStyle = TK.muted;
+    c.fillText(ph.kind === 'quake' ? intensity(ph.pga) + ' · ' + fmt(R.freq, 1) + ' Hz' : ph.kind === 'settle' ? '停止搖晃，檢查變形' : '', 12, 46);
+  }
+  const tr = S.trace, n = tr.length, w = W - lx - 10;
+  if (n > 1) {
+    c.strokeStyle = TK.danger; c.lineWidth = 1.5; c.beginPath();
+    for (let i = 0; i < n; i++) { const x = lx + (i / 600) * w, y = H / 2 - tr[i] / 9.5 * (H / 2 - 6); i ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke();
+  }
+}
+
+// ---------- pointer ----------
+function localPt(e) { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+function nearestNode([px, py], maxR = 0.4) {
+  let best = null, bd = maxR * G.cell;
+  for (let y = 0; y <= SIM.MAXF; y++) for (let x = 0; x < 4; x++) { const n = SIM.id(x, y), [nx, ny] = nodePx(n), d = Math.hypot(nx - px, ny - py); if (d < bd) { bd = d; best = n; } }
+  return best;
+}
+function segDist(px, py, x1, y1, x2, y2) { const dx = x2 - x1, dy = y2 - y1, L2 = dx * dx + dy * dy, t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / L2)); return Math.hypot(px - x1 - t * dx, py - y1 - t * dy); }
+function hitMass([px, py]) {
+  for (const m of S.design.members) {
+    const k = SIM.key(m.a, m.b), cnt = S.design.masses[k]; if (!cnt) continue;
+    const [x1, y1] = nodePx(m.a), [x2, y2] = nodePx(m.b), cx = (x1 + x2) / 2, top = y1 - cnt * G.cell * 0.26 - 6;
+    if (Math.abs(px - cx) < G.cell * 0.33 && py > top && py < y1 + 4) return k;
+  }
+  return null;
+}
+function hitDamper([px, py]) {
+  for (const m of S.design.members) {
+    const k = SIM.key(m.a, m.b), li = S.design.dampers[k]; if (li == null) continue;
+    const [x1, y1] = nodePx(m.a), [x2, y2] = nodePx(m.b), hx = (x1 + x2) / 2, hy = (y1 + y2) / 2;
+    if (Math.abs(px - hx) < G.cell * 0.3 && py > hy + 4 && py < hy + SIM.DAMP_LEN[li] / SIM.CELL * G.cell + G.cell * 0.26) return k;
+  }
+  return null;
+}
+function hitMember([px, py], maxD = 0.2) {
+  let best = -1, bd = maxD * G.cell;
+  S.design.members.forEach((m, i) => { const [x1, y1] = nodePx(m.a), [x2, y2] = nodePx(m.b), d = segDist(px, py, x1, y1, x2, y2); if (d < bd) { bd = d; best = i; } });
+  return best;
+}
+function hitBeamForMass([px, py]) {
+  let best = -1, bd = G.cell * 0.4;
+  S.design.members.forEach((m, i) => { const [x1, y1] = nodePx(m.a), [x2, y2] = nodePx(m.b); const d = segDist(px, py + G.cell * 0.15, x1, y1, x2, y2); if (d < bd && (SIM.isBeam(m) || bd === G.cell * 0.4)) { bd = d; best = i; } });
+  return best;
+}
+cv.addEventListener('pointerdown', e => {
+  if (!editable()) return;
+  const p = localPt(e);
+  if (e.button === 2 || S.tool === 'erase') {
+    const dk = hitDamper(p); if (dk) { removeDamper(dk); return; }
+    const k = hitMass(p); if (k) { removeMass(k); return; }
+    const i = hitMember(p); if (i >= 0) removeMember(i); return;
+  }
+  if (S.tool === 'mass') { const k = hitMass(p); const i = hitBeamForMass(p); if (i >= 0) addMass(i); else if (k) toast('這根橫梁已經疊 2 塊了'); else toast('點一根橫梁來放質量塊'); return; }
+  if (S.tool === 'damp') {
+    const dk = hitDamper(p);
+    let i = dk ? S.design.members.findIndex(m => SIM.key(m.a, m.b) === dk) : hitMember(p, 0.3);
+    if (i < 0) { toast('點一根橫梁來吊阻尼器'); return; }
+    addDamper(i); return;
+  }
+  const n = nearestNode(p);
+  if (n == null) { S.pickFrom = null; draw(); return; }
+  if (S.pickFrom != null && S.pickFrom !== n) { addMember(S.pickFrom, n, S.tool); S.pickFrom = null; draw(); return; }
+  S.dragFrom = n; cv.setPointerCapture(e.pointerId); draw();
+});
+cv.addEventListener('pointermove', e => {
+  if (!editable()) return;
+  const p = localPt(e); S.pointer = p;
+  const n = nearestNode(p);
+  if (n !== S.hoverNode || S.dragFrom != null || S.pickFrom != null) { S.hoverNode = n; draw(); }
+});
+cv.addEventListener('pointerup', e => {
+  if (!editable() || S.dragFrom == null) return;
+  const n = nearestNode(localPt(e));
+  const from = S.dragFrom; S.dragFrom = null;
+  if (n != null && n !== from) addMember(from, n, S.tool);
+  else if (n === from) { S.pickFrom = from; toast('再點旁邊的一個點'); }
+  draw();
+});
+cv.addEventListener('pointerleave', () => { S.hoverNode = null; S.pointer = null; draw(); });
+cv.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,textarea,select')) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); $('#btnUndo').click(); return; }
+  const T = TOOLS.find(t => t.key === e.key); if (T && editable()) setTool(T.t);
+  if (e.key === 'Escape') { S.pickFrom = null; S.dragFrom = null; draw(); }
+});
+
+// ---------- inspection sheet ----------
+function renderSheet() {
+  const sh = $('#sheet'); sh.textContent = '';
+  if (S.runner) return renderTestSheet(sh);
+  const st = SIM.analyze(S.design);
+  $('#woodTxt').textContent = fmt(st.wood / 10, 1) + ' / ' + SIM.WOOD_MAX / 10 + ' m'; $('#woodBar').style.width = Math.min(100, st.wood / SIM.WOOD_MAX * 100) + '%';
+  $('#ropeTxt').textContent = fmt(st.rope / 10, 1) + ' / ' + SIM.ROPE_MAX / 10 + ' m'; $('#ropeBar').style.width = Math.min(100, st.rope / SIM.ROPE_MAX * 100) + '%';
+  sh.append(el('div', { class: 'label', text: '設計檢查' }));
+  const ul = el('ul', { class: 'checks' });
+  for (const c of st.checks) ul.append(el('li', { class: c.ok ? 'ok' : 'bad' }, el('span', { class: 'mk', text: c.ok ? '✓' : '!' }), el('span', { text: c.label }), el('span', { class: 'dt', text: c.detail })));
+  sh.append(ul);
+  sh.append(el('div', { class: 'label', text: '目前數據' }));
+  const stats = el('div', { class: 'stats' });
+  const stat = (v, l) => el('div', { class: 'stat' }, el('b', { text: v }), el('span', { text: l }));
+  stats.append(stat(st.floors + ' 層', '樓層'), stat(st.blocks + ' 塊', '質量塊'), stat(fmt(st.weight, 1) + ' g', '材料重量'), stat('×' + fmt(st.heightBonus, 2), '高度加成'));
+  sh.append(stats);
+  sh.append(el('div', { class: 'label', text: '搖晃頻率' }));
+  const fq = el('div', { class: 'formula' });
+  const nf = S.natFreq;
+  fq.append('房子自然頻率 ', el('b', { text: nf === undefined ? '計算中…' : nf == null ? '—' : nf > 8 ? '超過 8 Hz' : fmt(nf, 1) + ' Hz' }));
+  if (nf === null) fq.append(el('br'), SIM.totalBlocks(S.design) ? '房子站不穩，量不到頻率' : '放上質量塊後才量得到');
+  else if (nf > 6) fq.append(el('br'), '很硬，地震（1 到 6 Hz）不容易讓它共振');
+  for (const dm of st.dampers) fq.append(el('br'), '阻尼器 ', el('b', { text: fmt(dm.f, 1) + ' Hz' }), `（繩長 ${fmt(SIM.DAMP_LEN[dm.i] * 100, 1)} cm）`);
+  if (st.dampers.length && nf > 0 && nf <= 6) fq.append(el('br'), '提示：阻尼器比房子慢一點，通常效果最好');
+  sh.append(fq);
+  const best = SIM.score(st, 900);
+  sh.append(el('div', { class: 'label', text: '如果撐過 900 gal' }));
+  const f = el('div', { class: 'formula' });
+  f.append('性能 ', el('b', { text: fmt(best.perf, 2) }), ' ÷ 價格 ', el('b', { text: fmt(best.price, 2) }), el('br'), 'CP 值最高可以到 ', el('b', { text: st.ok ? fmt(best.cp, 1) : '—' }));
+  sh.append(f);
+  sh.append(el('div', { class: 'spacer' }));
+  const go = el('button', { class: 'btn primary', id: 'btnTest', onclick: startTest, text: S.phase === 'build' ? '送上振動台' : '開始挑戰' });
+  go.disabled = !st.ok || S.phase !== 'build';
+  sh.append(go);
+  if (!st.ok && S.phase === 'build') sh.append(el('p', { class: 'note', text: '設計檢查全部打勾才能測試。' }));
+}
+function renderTestSheet(sh) {
+  const R = S.runner;
+  sh.append(el('div', { class: 'label', text: '振動台測試' }));
+  const ul = el('ul', { class: 'rounds' });
+  const g = R.phase.kind === 'gravity' || (R.fail && R.fail.kind === 'gravity');
+  ul.append(el('li', {}, el('b', { text: '靜載重' }), el('small', { text: '放上質量塊' }), el('span', { class: 'pill ' + (R.fail && R.fail.kind === 'gravity' ? 'fail' : g && !R.fail ? 'run' : 'pass'), text: R.fail && R.fail.kind === 'gravity' ? '倒了' : g && !R.fail ? '進行中' : '撐住' })));
+  for (const r of R.rounds) {
+    const map = { wait: ['', '等待'], run: ['run', '搖晃中'], pass: ['pass', '通過'], fail: ['fail', '失敗'] };
+    const [cls, txt] = map[r.status] || ['', '—'];
+    ul.append(el('li', {}, el('b', { text: r.pga + ' gal' }), el('small', { text: intensity(r.pga) }), el('span', { class: 'pill ' + cls, text: R.fail && r.status === 'wait' ? '—' : txt })));
+  }
+  sh.append(ul);
+  const dmg = { hinge: 0, buckle: 0, pull: 0, snap: 0, uplift: 0 };
+  for (const e of R.events) dmg[e.type]++;
+  sh.append(el('div', { class: 'label', text: '損壞紀錄' }));
+  const stats = el('div', { class: 'stats' });
+  const stat = (v, l) => el('div', { class: 'stat' }, el('b', { text: String(v) }), el('span', { text: l }));
+  stats.append(stat(dmg.hinge, '接點裂開'), stat(dmg.buckle, '受壓彎掉'), stat(dmg.pull + dmg.snap, '被拉斷'), stat(dmg.uplift, '柱腳拔起'));
+  sh.append(stats);
+  sh.append(el('p', { class: 'note', text: '構件越紅代表受力越接近極限；紅圈是裂開的膠合接點。' + (R.dampers.length ? '黃色底的鐵塊是阻尼器，看它怎麼跟房子反方向擺動。' : '') }));
+}
+
+// ---------- timer ----------
+function tick() {
+  if (S.phase !== 'build' || S.mode !== 'timed') return;
+  S.timeLeft = Math.max(0, TIME_LIMIT - (Date.now() - S.buildStart) / 1000);
+  const t = $('#timer'); $('#timerVal').textContent = mmss(Math.ceil(S.timeLeft));
+  t.classList.toggle('warn', S.timeLeft <= 60 && S.timeLeft > 30); t.classList.toggle('crit', S.timeLeft <= 30);
+  if (S.timeLeft <= 0) {
+    clearInterval(S.timerId);
+    if (SIM.analyze(S.design).ok) { toast('時間到！送上振動台'); startTest(); }
+    else { S.phase = 'result'; showTimeout(); }
+  }
+}
+function startBuild(mode, keep) {
+  S.mode = mode; S.phase = 'build'; S.runner = null; S.debris = []; S.seen = new Set(); S.trace = [];
+  if (!keep) { S.design = blankDesign(); S.undo = []; }
+  scheduleFreq();
+  S.buildStart = Date.now(); S.timeLeft = TIME_LIMIT;
+  $('#timer').hidden = mode !== 'timed'; $('#timer').classList.remove('warn', 'crit'); $('#timerVal').textContent = mmss(TIME_LIMIT);
+  $('#speed').hidden = true;
+  clearInterval(S.timerId); if (mode === 'timed') S.timerId = setInterval(tick, 250);
+  hide('ovIntro'); hide('ovResult');
+  renderSheet(); draw(); drawSeis();
+}
+$('#btnStart').onclick = () => startBuild('timed', false);
+$('#btnPractice').onclick = () => startBuild('practice', false);
+$('#btnIntroRules').onclick = () => show('ovRules');
+$('#btnRules').onclick = () => show('ovRules');
+
+// ---------- test ----------
+let raf = 0, lastT = 0;
+function startTest() {
+  if (S.phase !== 'build' || !SIM.analyze(S.design).ok) return;
+  clearInterval(S.timerId);
+  S.buildSec = Math.min(TIME_LIMIT, Math.round((Date.now() - S.buildStart) / 1000));
+  S.phase = 'test'; S.runner = SIM.createRunner(S.design); S.debris = []; S.seen = new Set(); S.trace = []; S.pickFrom = null; S.dragFrom = null;
+  $('#speed').hidden = false; setSpeed(1);
+  renderSheet();
+  lastT = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+}
+function setSpeed(v) { S.speed = v; document.querySelectorAll('#speed [data-speed]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.speed === v))); }
+document.querySelectorAll('#speed [data-speed]').forEach(b => b.onclick = () => setSpeed(+b.dataset.speed));
+$('#btnSkip').onclick = () => { if (!S.runner) return; S.runner.runAll(); };
+let sheetClock = 0, traceAcc = 0;
+function loop(now) {
+  const R = S.runner; if (!R) return;
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+  const sim = dt * S.speed, chunks = Math.max(1, Math.round(sim / 0.004));
+  for (let i = 0; i < chunks && !R.done; i++) {
+    R.advance(sim / chunks);
+    traceAcc += sim / chunks;
+    while (traceAcc >= 8 / 600) { traceAcc -= 8 / 600; S.trace.push(R.ag); if (S.trace.length > 600) S.trace.shift(); }
+  }
+  stepDebris(dt);
+  draw(); drawSeis();
+  sheetClock += dt; if (sheetClock > 0.25) { sheetClock = 0; renderSheet(); }
+  if (R.done) { renderSheet(); setTimeout(showResult, 500); return; }
+  raf = requestAnimationFrame(loop);
+}
+
+// ---------- results ----------
+const CAUSE = {
+  gravity: ['還沒地震就垮了', '放上質量塊之後，房子自己就撐不住了。'],
+  mass: ['質量塊掉下來了', '放質量塊的橫梁斷了或脫落，鐵塊掉了下來。'],
+  collapse: ['房子倒塌了', '樓板往下掉或整棟歪倒。'],
+  uplift: ['柱腳被拔起來了', '一半以上的柱腳離開底板。'],
+  drift: ['房子歪掉回不來', '地震停止後，房子還歪超過 10 cm。'],
+};
+const TIP = {
+  hinge: '四邊形的框架只靠膠合接點撐著，接點一裂開就會像平行四邊形一樣被推倒。加上斜撐變成三角形，形狀就固定住了！',
+  buckle: '細長的木條被壓的時候會突然彎掉（挫屈），斜撐比較長，更容易彎。試試粗木條，或在同一格做 X 形交叉，讓兩根一起分擔。',
+  snap: '棉繩只能拉、不能推，拉太大力也會斷。同一格放兩條交叉的棉繩，左右搖的時候都有一條在出力。',
+  pull: '接點被拉開了，這根構件承受很大的拉力。改用粗木條，或多加斜撐分擔力量。',
+  uplift: '房子越高、越窄、上面越重，搖晃時越容易翻倒，柱腳會被往上拔。把質量塊放低一點、底層柱子改用粗木條，或多放幾根柱子試試。',
+  gravity: '先確認每根橫梁兩端都有柱子撐著，柱子一路接到地面。質量塊太集中在細柱上也會壓垮它。',
+  win: '太強了！想要更高的 CP 值，可以減少材料讓房子更輕、多放幾塊質量塊，或把質量塊放到更高的樓層。',
+};
+function pickTip(sum) {
+  if (!sum.fail) return TIP.win;
+  if (sum.fail.kind === 'gravity' && !Object.keys(sum.counts).length) return TIP.gravity;
+  if (sum.fail.why === 'uplift' || sum.counts.uplift) return TIP.uplift;
+  const first = sum.firstDamage?.type;
+  return TIP[first] || TIP.hinge;
+}
+function showResult() {
+  const R = S.runner, sum = R.summary(), st = SIM.analyze(S.design), sc = SIM.score(st, sum.pga);
+  S.phase = 'result';
+  S.result = { sum, st, sc, at: Date.now() };
+  const card = $('#resultCard'); card.textContent = '';
+  const cause = sum.fail ? CAUSE[sum.fail.kind === 'gravity' ? 'gravity' : sum.fail.why] : null;
+  const head = !sum.fail ? '屹立不倒！撐過 900 gal' : sum.pga ? `撐過 ${sum.pga} gal，在 ${sum.fail.pga} gal 時${cause[0].replace('了', '')}` : cause[0];
+  card.append(el('h2', { text: head }));
+  if (cause) card.append(el('p', { class: 'lead', text: cause[1] }));
+  card.append(el('div', { class: 'verdict' }, el('span', { class: 'big', text: fmt(sc.cp, 1) }), el('span', {}, el('b', { text: 'CP 值' }), el('br'), el('span', { class: 'note', text: S.mode === 'practice' ? '練習模式，不列入排行榜' : '建造用時 ' + mmss(S.buildSec) }))));
+  const badges = el('div', { class: 'badges' });
+  badges.append(el('span', { class: 'badge' + (sum.pga >= 400 ? '' : ' off'), text: '結構耐震能力獎 · 撐過 400 gal' }));
+  badges.append(el('span', { class: 'badge' + (sum.pga >= 900 ? '' : ' off'), text: '屹立不倒獎 · 撐過 900 gal' }));
+  card.append(badges);
+  const f = el('div', { class: 'formula' });
+  f.append('性能 = 地震 ', el('b', { text: `${sum.pga}÷980 = ${fmt(sum.pga / 980, 2)}` }), ' × 質量塊 ', el('b', { text: String(st.blocks) }), ' × 高度加成 ', el('b', { text: fmt(st.heightBonus, 2) }), ' = ', el('b', { text: fmt(sc.perf, 2) }), el('br'),
+    '價格 = 材料 ', el('b', { text: fmt(st.weight, 1) + ' g' }), ' ÷ 100 g = ', el('b', { text: fmt(sc.price, 2) }), el('br'),
+    'CP 值 = ', el('b', { text: fmt(sc.perf, 2) }), ' ÷ ', el('b', { text: fmt(sc.price, 2) }), ' = ', el('b', { text: fmt(sc.cp, 1) }));
+  card.append(f);
+  card.append(el('div', { class: 'tip', text: pickTip(sum) }));
+  if (sum.peakFreq > 0) {
+    const fp = el('p', { class: 'note' });
+    fp.append(`地震搖到 ${fmt(sum.peakFreq, 1)} Hz 左右時，你的房子晃得最厲害（共振）。`);
+    if (st.dampers.length) fp.append(`你的阻尼器是 ${st.dampers.map(d => fmt(d.f, 1) + ' Hz').join('、')}。換不同繩長，看看哪一種最能減少搖晃。`);
+    else if (sum.fail && sum.peakFreq < 6) fp.append('可以試試吊一個阻尼器，頻率選比這個低一點的。');
+    card.append(fp);
+  }
+  if (S.mode === 'timed' && sc.cp > 0) card.append(submitBlock());
+  card.append(el('div', { class: 'cta' },
+    el('button', { class: 'btn primary', text: '修改設計再挑戰', onclick: () => startBuild(S.mode, true) }),
+    el('button', { class: 'btn', text: '從空白重新開始', onclick: () => startBuild(S.mode, false) }),
+    el('button', { class: 'btn ghost', text: '看排行榜', onclick: openBoard })));
+  saveLocal();
+  show('ovResult');
+}
+function showTimeout() {
+  const card = $('#resultCard'); card.textContent = '';
+  const st = SIM.analyze(S.design);
+  card.append(el('h2', { text: '時間到，設計還沒完成' }), el('p', { class: 'lead', text: '送上振動台之前，設計檢查要全部打勾。還沒過關的是：' }));
+  const ul = el('ul', { class: 'ruleslist' }); for (const c of st.checks.filter(c => !c.ok)) ul.append(el('li', { text: c.label + (c.detail ? '（目前 ' + c.detail + '）' : '') }));
+  card.append(ul);
+  card.append(el('div', { class: 'cta' }, el('button', { class: 'btn primary', text: '保留設計再試一次', onclick: () => startBuild('timed', true) }), el('button', { class: 'btn', text: '從空白重新開始', onclick: () => startBuild('timed', false) })));
+  show('ovResult');
+}
+function resultCode(name, cls) { return Codec.encode({ n: name, c: cls, t: S.buildSec, d: Codec.pack(S.design) }); }
+function submitBlock() {
+  const me = store.get('kzw-me', { name: '', cls: '' });
+  const box = el('div', { class: 'teacher', style: 'border-top:none;padding-top:0' });
+  const nameI = el('input', { id: 'subName', maxlength: '16', placeholder: '例如：12 號 小明', value: me.name });
+  const clsI = el('input', { id: 'subCls', maxlength: '12', placeholder: '例如：201', value: me.cls });
+  const msg = el('span', { class: 'msg' });
+  const codeI = el('input', { readonly: '', 'aria-label': '成績碼' });
+  const codeRow = el('div', { class: 'code' }, codeI, el('button', { class: 'btn small', text: '複製', onclick: () => {
+    codeI.select(); navigator.clipboard?.writeText(codeI.value).then(() => toast('已複製成績碼'), () => toast('請按 Ctrl+C 複製'));
+  } }));
+  codeRow.hidden = true;
+  const btn = el('button', { class: 'btn primary', text: '登上排行榜', onclick: async () => {
+    const name = nameI.value.trim(), cls = clsI.value.trim();
+    if (!name) { msg.className = 'msg bad'; msg.textContent = '請先填名字或座號'; nameI.focus(); return; }
+    store.set('kzw-me', { name, cls });
+    codeI.value = resultCode(name, cls); codeRow.hidden = false;
+    btn.disabled = true; msg.className = 'msg'; msg.textContent = '送出中…';
+    const ok = await submitScore(name, cls, codeI.value, 'self');
+    if (ok === true) { msg.className = 'msg ok'; msg.textContent = '已登上排行榜！'; }
+    else { btn.disabled = false; msg.className = 'msg bad'; msg.textContent = ok; }
+  } });
+  box.append(el('h3', { text: '登上排行榜' }),
+    el('div', { class: 'form' }, el('label', { for: 'subName' }, '名字或座號', nameI), el('label', { for: 'subCls' }, '班級（可不填）', clsI), btn),
+    msg, codeRow);
+  return box;
+}
+
+// ---------- leaderboard ----------
+const LB = { db: null, user: null, canWrite: null, editor: false, rows: [], ready: false, err: '' };
+function rowFromResult(name, cls, code, src, sum, st, sc, t) {
+  return { name: name.slice(0, 16), cls: cls.slice(0, 12), cp: Math.round(sc.cp * 100) / 100, pga: sum.pga, floors: st.floors, blocks: st.blocks, weight: Math.round(st.weight * 10) / 10, time: t, code, src, at: Date.now() };
+}
+async function submitScore(name, cls, code, src) {
+  const { sum, st, sc } = S.result;
+  const row = rowFromResult(name, cls, code, src, sum, st, sc, S.buildSec);
+  if (!LB.db) return '目前沒有連上排行榜（需要登入 claude.ai）。請把上面的成績碼交給老師登錄。';
+  if (LB.canWrite === false) return '你的帳號沒有排行榜寫入權限。請把上面的成績碼交給老師登錄。';
+  try { await LB.db.collection('scores').add(row); return true; }
+  catch (e) {
+    if (e && e.code === 'invalid_argument') { LB.canWrite = false; return '你的帳號沒有排行榜寫入權限。請把上面的成績碼交給老師登錄。'; }
+    if (e && e.code === 'quota_exceeded') return '排行榜已滿，請老師清掉一些舊成績。';
+    return '送出失敗，請稍後再試，或把成績碼交給老師。';
+  }
+}
+function saveLocal() {
+  const { sum, st, sc } = S.result; if (S.mode !== 'timed') return;
+  const list = store.get('kzw-local', []);
+  list.push({ name: '我（這台電腦）', cls: '', cp: Math.round(sc.cp * 100) / 100, pga: sum.pga, floors: st.floors, blocks: st.blocks, weight: Math.round(st.weight * 10) / 10, time: S.buildSec, src: 'local', at: Date.now() });
+  list.sort((a, b) => b.cp - a.cp); store.set('kzw-local', list.slice(0, 10));
+}
+function openBoard() { hide('ovResult'); renderBoard(); show('ovBoard'); }
+$('#btnBoard').onclick = openBoard;
+$('#clsFilter').onchange = renderBoard;
+function renderBoard() {
+  const body = $('#boardBody'); body.textContent = '';
+  const live = LB.db && LB.ready;
+  let rows = live ? LB.rows : store.get('kzw-local', []);
+  $('#boardStatus').textContent = live ? '每位同學只列出最好的一次成績，同分時用時較短的排前面。'
+    : LB.err || (LB.db ? '正在讀取排行榜…' : '目前沒有連上共用排行榜（需要登入 claude.ai 才看得到），下面是這台電腦上的紀錄。');
+  // classes
+  const sel = $('#clsFilter'), cur = sel.value, classes = [...new Set(rows.map(r => r.cls).filter(Boolean))].sort();
+  sel.textContent = ''; sel.append(el('option', { value: '', text: '全部' })); for (const c of classes) sel.append(el('option', { value: c, text: c }));
+  sel.value = classes.includes(cur) ? cur : '';
+  if (sel.value) rows = rows.filter(r => r.cls === sel.value);
+  // best per person
+  const best = new Map();
+  for (const r of rows) { const k = live ? (r.cls || '') + '|' + r.name : r.at; const o = best.get(k); if (!o || r.cp > o.cp || (r.cp === o.cp && r.time < o.time)) best.set(k, r); }
+  rows = [...best.values()].sort((a, b) => b.cp - a.cp || a.time - b.time);
+  if (!rows.length) { body.append(el('tr', {}, el('td', { colspan: '10', class: 'empty', text: '還沒有成績。完成一次計時挑戰，第一名就是你！' }))); }
+  rows.forEach((r, i) => {
+    const tr = el('tr', { class: i === 0 ? 'top1' : '' },
+      el('td', { class: 'rank', text: String(i + 1) }),
+      el('td', {}, el('span', { text: r.name }), r.src === 'teacher' ? el('span', { class: 'tag', style: 'margin-left:6px', text: '老師登錄' }) : null),
+      el('td', { text: r.cls || '—' }),
+      el('td', { class: 'num', text: fmt(r.cp, 1) }),
+      el('td', { class: 'num', text: r.pga + ' gal' }),
+      el('td', { class: 'num', text: r.floors + ' 層' }),
+      el('td', { class: 'num', text: String(r.blocks) }),
+      el('td', { class: 'num', text: fmt(r.weight, 1) + ' g' }),
+      el('td', { class: 'num', text: mmss(r.time || 0) }),
+      el('td', {}, live && LB.editor ? el('button', { class: 'del', title: '刪除這筆成績', 'aria-label': '刪除 ' + r.name + ' 的成績', text: '×', onclick: () => delRow(r, tr) }) : null));
+    body.append(tr);
+  });
+  $('#teacherBox').hidden = !(LB.db && LB.editor);
+}
+function delRow(r, tr) {
+  const btn = tr.querySelector('.del');
+  if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = '確定刪除？'; btn.style.fontSize = '12px'; btn.style.color = 'var(--danger)'; setTimeout(() => { if (btn.isConnected) { btn.dataset.armed = ''; btn.textContent = '×'; btn.style = ''; } }, 3000); return; }
+  // remove every entry of this person so the next best doesn't pop up unexpectedly
+  const same = LB.rows.filter(x => x.name === r.name && (x.cls || '') === (r.cls || ''));
+  (async () => { for (const x of same) { try { await LB.db.doc('scores/' + x.id).delete(); } catch { } } })();
+}
+$('#btnImport').onclick = async () => {
+  const lines = $('#codesIn').value.split(/\s+/).filter(Boolean), msg = $('#importMsg');
+  if (!lines.length) { msg.className = 'msg bad'; msg.textContent = '請先貼上成績碼'; return; }
+  let ok = 0, bad = 0; $('#btnImport').disabled = true;
+  for (let i = 0; i < lines.length; i++) {
+    msg.className = 'msg'; msg.textContent = `驗證中 ${i + 1} / ${lines.length}…`;
+    await new Promise(r => setTimeout(r, 30));
+    try {
+      const o = Codec.decode(lines[i]), d = Codec.unpack(o.d), st = SIM.analyze(d);
+      if (!st.ok || !o.n) throw 0;
+      const sum = SIM.createRunner(d).runAll().summary(), sc = SIM.score(st, sum.pga);
+      await LB.db.collection('scores').add(rowFromResult(String(o.n), String(o.c || ''), lines[i], 'teacher', sum, st, sc, Math.min(TIME_LIMIT, +o.t || TIME_LIMIT)));
+      ok++;
+    } catch { bad++; }
+  }
+  $('#btnImport').disabled = false;
+  msg.className = bad ? 'msg bad' : 'msg ok'; msg.textContent = `登錄了 ${ok} 筆` + (bad ? `，${bad} 筆無法辨識或不符合規則` : '');
+  if (ok) $('#codesIn').value = '';
+};
+async function connectBoard() {
+  try {
+    if (!window.claude?.use) return;
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    LB.db = db; LB.user = user;
+    if (user) { LB.canWrite = await user.can('data.write'); LB.editor = (await user.canEdit()) || (await user.isOwner()); }
+    if (!db) { renderBoard(); return; }
+    db.collection('scores').orderBy('cp', 'desc').limit(500).onSnapshot(snap => {
+      LB.rows = snap.docs.map(d => ({ id: d.id, ...d.data() })); LB.ready = true;
+      if (!$('#ovBoard').hidden) renderBoard();
+    }, () => { LB.err = '排行榜暫時連不上，下面是這台電腦上的紀錄。'; LB.ready = false; if (!$('#ovBoard').hidden) renderBoard(); });
+  } catch { }
+}
+
+// ---------- boot ----------
+function start(data) {
+  renderTools();
+  if (data && data.design) { S.design = { ...blankDesign(), ...data.design }; }
+  scheduleFreq();
+  renderSheet();
+  resize();
+  new ResizeObserver(resize).observe($('#boardWrap'));
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readTokens(); draw(); drawSeis(); });
+  new MutationObserver(() => { readTokens(); draw(); drawSeis(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  document.fonts?.ready.then(() => { draw(); drawSeis(); });
+  connectBoard();
+  if (data && data.phase === 'build') { hide('ovIntro'); startBuild(data.mode || 'practice', true); }
+}
+try { window.claude?.hot?.snapshot?.(() => ({ design: S.design, phase: S.phase === 'build' ? 'build' : 'intro', mode: S.mode })); } catch { }
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
